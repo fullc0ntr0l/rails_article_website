@@ -7,4 +7,6 @@ class Article < ActiveRecord::Base
                     length: { minimum: 5, maximum: 255 }
   validates :content, presence: true,
                       length: { minimum: 10 }
+
+  has_many :comments, dependent: :destroy
 end

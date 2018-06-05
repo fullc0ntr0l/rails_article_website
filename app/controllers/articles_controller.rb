@@ -1,4 +1,5 @@
 class ArticlesController < ApplicationController
+  http_basic_authenticate_with name: 'admin', password: 'admin'
   # GET /articles
   # GET /articles.json
   def index
@@ -44,6 +45,8 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       if @article.save
+        clear_articles_cache
+
         format.html { redirect_to @article, notice: 'Article was successfully created.' }
         format.json { render json: @article, status: :created, location: @article }
       else
@@ -60,6 +63,8 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       if @article.update_attributes(params[:article])
+        clear_articles_cache
+
         format.html { redirect_to @article, notice: 'Article was successfully updated.' }
         format.json { head :no_content }
       else
@@ -75,6 +80,8 @@ class ArticlesController < ApplicationController
     @article = Article.find(params[:id])
     @article.destroy
 
+    clear_articles_cache
+
     respond_to do |format|
       format.html { redirect_to articles_url }
       format.json { head :no_content }
@@ -82,6 +89,10 @@ class ArticlesController < ApplicationController
   end
 
   private
+
+  def clear_articles_cache
+    $redis.del('articles')
+  end
 
   def fetch_cached_articles
     articles = $redis.get('articles')

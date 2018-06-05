@@ -1,0 +1,5 @@
+<%= form_for([@article, @article.comments.build]) do |f| %>
+  <div class="field">
+    <%= f.text_field :body, placeholder: 'Add your comment here..', autocomplete: 'off' %>
+  </div>
+<% end %>
