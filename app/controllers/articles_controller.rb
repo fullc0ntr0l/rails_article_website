@@ -2,7 +2,7 @@ class ArticlesController < ApplicationController
   # GET /articles
   # GET /articles.json
   def index
-    @articles = Article.all
+    @articles = fetch_cached_articles
 
     respond_to do |format|
       format.html # index.html.erb
@@ -79,5 +79,19 @@ class ArticlesController < ApplicationController
       format.html { redirect_to articles_url }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def fetch_cached_articles
+    articles = $redis.get('articles')
+
+    if articles.nil?
+      articles = Article.all.to_json
+      $redis.set('articles', articles)
+      $redis.expire('articles', 1.hour.to_i)
+    end
+
+    JSON.parse articles
   end
 end

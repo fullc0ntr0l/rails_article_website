@@ -22,9 +22,15 @@ end
 
 group :development do
   gem 'test-unit', '~> 3.0'
+  gem 'rack-mini-profiler'
 end
 
 gem 'jquery-rails'
+
+gem 'redis'
+gem 'redis-namespace'
+gem 'redis-rails'
+gem 'redis-rack-cache'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
