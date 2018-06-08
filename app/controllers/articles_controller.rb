@@ -1,8 +1,10 @@
+require 'article/article_cached'
+
 class ArticlesController < ApplicationController
   # GET /articles
   # GET /articles.json
   def index
-    @articles = fetch_cached_articles
+    @articles = ArticleCached.all
 
     respond_to do |format|
       format.html # index.html.erb
@@ -13,7 +15,7 @@ class ArticlesController < ApplicationController
   # GET /articles/1
   # GET /articles/1.json
   def show
-    @article = Article.find(params[:id])
+    @article = ArticleCached.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -24,7 +26,7 @@ class ArticlesController < ApplicationController
   # GET /articles/new
   # GET /articles/new.json
   def new
-    @article = Article.new
+    @article = ArticleCached.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -34,17 +36,17 @@ class ArticlesController < ApplicationController
 
   # GET /articles/1/edit
   def edit
-    @article = Article.find(params[:id])
+    @article = ArticleCached.find(params[:id])
   end
 
   # POST /articles
   # POST /articles.json
   def create
-    @article = Article.new(params[:article])
+    @article = ArticleCached.new(params[:article])
 
     respond_to do |format|
       if @article.save
-        clear_articles_cache
+        ArticleCached.clear_cached_articles
 
         format.html { redirect_to @article, notice: 'Article was successfully created.' }
         format.json { render json: @article, status: :created, location: @article }
@@ -58,11 +60,11 @@ class ArticlesController < ApplicationController
   # PUT /articles/1
   # PUT /articles/1.json
   def update
-    @article = Article.find(params[:id])
+    @article = ArticleCached.find(params[:id])
 
     respond_to do |format|
       if @article.update_attributes(params[:article])
-        clear_articles_cache
+        ArticleCached.clear_cached_articles
 
         format.html { redirect_to @article, notice: 'Article was successfully updated.' }
         format.json { head :no_content }
@@ -76,32 +78,14 @@ class ArticlesController < ApplicationController
   # DELETE /articles/1
   # DELETE /articles/1.json
   def destroy
-    @article = Article.find(params[:id])
+    @article = ArticleCached.find(params[:id])
     @article.destroy
 
-    clear_articles_cache
+    ArticleCached.clear_cached_articles
 
     respond_to do |format|
       format.html { redirect_to articles_url }
       format.json { head :no_content }
     end
-  end
-
-  private
-
-  def clear_articles_cache
-    $redis.del('articles')
-  end
-
-  def fetch_cached_articles
-    articles = $redis.get('articles')
-
-    if articles.nil?
-      articles = Article.all.to_json
-      $redis.set('articles', articles)
-      $redis.expire('articles', 1.hour.to_i)
-    end
-
-    JSON.parse articles
   end
 end
