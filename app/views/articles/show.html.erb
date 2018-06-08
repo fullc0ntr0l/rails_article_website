@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<div class="action-buttons">
+  <%= link_to 'Back', articles_path, class: 'text-button' %>
+  <%= link_to 'Edit', edit_article_path(@article), class: 'text-button' %>
+  <%= link_to 'Delete', @article, method: :delete, data: { confirm: 'Are you sure?' }, class: 'text-button' %>
+</div>
+
+<h1 class="article-title"><%= @article.title %></h1>
+<h2 class="article-subtitle"><%= @article.name %></h2>
+<p class="article-content"><%= @article.content %></p>
+
+<div class="comments">
+  <%= render @article.comments %>
+
+  <br />
+
+  <%= render 'comments/form' %>
+</div>
